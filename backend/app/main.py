@@ -1,6 +1,7 @@
 from fastapi import FastAPI
 from app.core.config import settings
 from app.api.seo import router as seo_router
+from app.db.init_db import init_db
 
 app = FastAPI(
     title=settings.app_name,
@@ -9,8 +10,15 @@ app = FastAPI(
     description="Enterprise AI multi-agent system for YouTube marketing automation.",
 )
 
+
+@app.on_event("startup")
+def on_startup():
+    init_db()
+
+
 # Register API routers
 app.include_router(seo_router)
+
 
 @app.get("/")
 def root():
@@ -43,5 +51,5 @@ def config():
         "database_configured": bool(settings.database_url),
         "redis_configured": bool(settings.redis_url),
         "qdrant_configured": bool(settings.qdrant_url),
-        "openai_api_key_configured": bool(settings.openai_api_key),
+        "gemini_api_key_configured": bool(settings.gemini_api_key),
     }
