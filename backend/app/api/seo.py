@@ -69,28 +69,6 @@ def get_history(
         for record in records
     ]
 
-@router.get("/{generation_id}")
-def get_generation(generation_id: int, db: Session = Depends(get_db)):
-    record = (
-        db.query(SEOGeneration)
-        .filter(SEOGeneration.id == generation_id)
-        .first()
-    )
-
-    if not record:
-        raise HTTPException(
-            status_code=404,
-            detail="SEO generation not found",
-        )
-
-    return {
-        "id": record.id,
-        "topic": record.topic,
-        "content": record.content,
-        "provider": record.provider,
-        "created_at": record.created_at,
-    }
-
 @router.get("/stats")
 def get_stats(db: Session = Depends(get_db)):
     total_generations = db.query(func.count(SEOGeneration.id)).scalar() or 0
@@ -117,3 +95,26 @@ def get_stats(db: Session = Depends(get_db)):
         ),
         "providers": ["gemini"],
     }
+
+@router.get("/{generation_id}")
+def get_generation(generation_id: int, db: Session = Depends(get_db)):
+    record = (
+        db.query(SEOGeneration)
+        .filter(SEOGeneration.id == generation_id)
+        .first()
+    )
+
+    if not record:
+        raise HTTPException(
+            status_code=404,
+            detail="SEO generation not found",
+        )
+
+    return {
+        "id": record.id,
+        "topic": record.topic,
+        "content": record.content,
+        "provider": record.provider,
+        "created_at": record.created_at,
+    }
+
