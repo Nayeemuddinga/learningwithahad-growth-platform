@@ -1,0 +1,51 @@
+version: "3.9"
+
+services:
+  api:
+    build:
+      context: ./backend
+    container_name: lwahad-api
+    ports:
+      - "8000:8000"
+    env_file:
+      - ./.env
+    depends_on:
+      - postgres
+      - redis
+      - qdrant
+    volumes:
+      - ./backend/app:/app/app
+    restart: unless-stopped
+
+  postgres:
+    image: postgres:16
+    container_name: lwahad-postgres
+    environment:
+      POSTGRES_DB: lwahad_growth
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+    ##ports:
+      #- "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    restart: unless-stopped
+
+  redis:
+    image: redis:7
+    container_name: lwahad-redis
+    #ports:
+     # - "6379:6379"
+    restart: unless-stopped
+
+  qdrant:
+    image: qdrant/qdrant:latest
+    container_name: lwahad-qdrant
+    ports:
+      - "6333:6333"
+    volumes:
+      - qdrant_data:/qdrant/storage
+    restart: unless-stopped
+
+volumes:
+  postgres_data:
+  qdrant_data:

@@ -1,13 +1,12 @@
-from openai import OpenAI
+import google.generativeai as genai
 from app.core.config import settings
 
-client = OpenAI(api_key=settings.openai_api_key)
+genai.configure(api_key=settings.gemini_api_key)
+
+model = genai.GenerativeModel("gemini-2.5-flash")
 
 
 def generate_seo_assets(topic: str) -> dict:
-    """
-    Generate YouTube SEO assets for a given topic.
-    """
     prompt = f"""
 You are a world-class YouTube SEO expert.
 
@@ -23,12 +22,9 @@ Return:
 Format the response in clean markdown.
 """
 
-    response = client.responses.create(
-        model="gpt-4.1-mini",
-        input=prompt,
-    )
+    response = model.generate_content(prompt)
 
     return {
         "topic": topic,
-        "content": response.output_text,
+        "content": response.text,
     }
